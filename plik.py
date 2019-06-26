@@ -1,5 +1,6 @@
 import string
 import sys
+import json
 
 def main():
     global words_source
@@ -11,17 +12,23 @@ def main():
     words_source = [words_source[i].strip(",") for i in range(len(words_source))]
 
     # Dictionary
-    mapping_dict = "dictionary.txt"
-    mapping_lines = [l.strip() for l in open(mapping_dict, encoding='utf-8')] 
+    # mapping_dict = "dictionary.txt"
+    # mapping_lines = [l.strip() for l in open(mapping_dict, encoding='utf-8')] 
+
+    # dict_new added
+    with open('dict_new.json') as f:
+        mapping_file_json = json.load(f)
+
     # Digits Dictionary
     global digits_dict
-    digits_dict = mapping_lines[:(mapping_lines.index("##$$**HOURS**$$##"))]
+    digits_dict = mapping_file_json['numbers']
     # Hours Dictionary
     global hours_dict
-    hours_dict = mapping_lines[(mapping_lines.index("##$$**HOURS**$$##")+1):(mapping_lines.index("##$$**DATES**$$##"))]
+    hours_dict = mapping_file_json['hours']
     # Dates Dictionary
     global dates_dict
-    dates_dict = mapping_lines[(mapping_lines.index("##$$**DATES**$$##")+1):(mapping_lines.index("##$$**ROMANNUM**$$##"))]
+    dates_dict = mapping_file_json['dates']
+    '''
     # Roman numbers Dictionary
     global romannum_dict
     romannum_dict = {k: int(v) for k, v in (l.split() for l in mapping_lines[(mapping_lines.index("##$$**ROMANNUM**$$##")+1):(mapping_lines.index("##$$**SHORTSDOT**$$##"))])}
@@ -31,7 +38,7 @@ def main():
     # Dictionary shorts
     global shorts_dict
     shorts_dict = {k: v.replace("_", " ") for k, v in (l.split() for l in mapping_lines[(mapping_lines.index("##$$**SHORTS**$$##")+1):(mapping_lines.index("##$$**END**$$##"))])}
-
+    '''
     nrl_result = []
 
     # Przetwarzanie textu
