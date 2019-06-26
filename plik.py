@@ -2,9 +2,13 @@ import string
 import sys
 import json
 
-def main():
+def main(args):
+    if len(args) == 0:
+        sys.stderr.write("No input text!\n")
+        sys.exit(1)
+
     global words_source
-    words_source = sys.argv[1:]
+    words_source = args
 
     words_source = [words_source[i].strip() for i in range(len(words_source))]
     words_source = [words_source[i].strip(",") for i in range(len(words_source))]
@@ -282,4 +286,4 @@ def text_num_read(word):
 ###############################################
 
 if __name__=="__main__":
-    main() 
+    main(sys.argv[1:]) 
