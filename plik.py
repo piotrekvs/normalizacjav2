@@ -200,7 +200,7 @@ def read_date (word):
     else:
         date_name = dates_dict[int(numbers[0]/10)+17] + " "
         if numbers[0]%10 != 0:
-            date_name = date_name + dates_dict[numbers[0]%10] + " "
+            date_name = date_name + dates_dict[numbers[0]%10-1] + " "
     
     # czytanie miesięcy
     date_name += dates_dict[numbers[1]+20] + " "
