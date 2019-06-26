@@ -1,5 +1,82 @@
 import string
 
+def main():
+    # Wprowadzenie tekstu
+    text_source = input("Wprowadź tekst: ")
+    # split into words by white space
+    global words_source
+    words_source = text_source.split()
+
+    words_source = [words_source[i].strip() for i in range(len(words_source))]
+    words_source = [words_source[i].strip(",") for i in range(len(words_source))]
+
+    # Dictionary
+    mapping_dict = "dictionary.txt"
+    mapping_lines = [l.strip() for l in open(mapping_dict, encoding='utf-8')] 
+    # Digits Dictionary
+    global digits_dict
+    digits_dict = mapping_lines[:(mapping_lines.index("##$$**HOURS**$$##"))]
+    # Hours Dictionary
+    global hours_dict
+    hours_dict = mapping_lines[(mapping_lines.index("##$$**HOURS**$$##")+1):(mapping_lines.index("##$$**DATES**$$##"))]
+    # Dates Dictionary
+    global dates_dict
+    dates_dict = mapping_lines[(mapping_lines.index("##$$**DATES**$$##")+1):(mapping_lines.index("##$$**ROMANNUM**$$##"))]
+    # Roman numbers Dictionary
+    global romannum_dict
+    romannum_dict = {k: int(v) for k, v in (l.split() for l in mapping_lines[(mapping_lines.index("##$$**ROMANNUM**$$##")+1):(mapping_lines.index("##$$**SHORTSDOT**$$##"))])}
+    # Dictionary shorts with dot
+    global shorts_dot_dict
+    shorts_dot_dict = {k: v.replace("_", " ") for k, v in (l.split() for l in mapping_lines[(mapping_lines.index("##$$**SHORTSDOT**$$##")+1):(mapping_lines.index("##$$**SHORTS**$$##"))])}
+    # Dictionary shorts
+    global shorts_dict
+    shorts_dict = {k: v.replace("_", " ") for k, v in (l.split() for l in mapping_lines[(mapping_lines.index("##$$**SHORTS**$$##")+1):(mapping_lines.index("##$$**END**$$##"))])}
+
+    nrl_result = []
+
+    # Przetwarzanie textu
+    for i, j in enumerate(words_source):
+        temp_skip = False
+        if len(j) > 0 and j[-1]=="." :
+            if j.lower() in shorts_dot_dict:
+                nrl_result.append(shorts_dot_dict[j.lower()])
+                temp_skip = True
+            else:
+                j=j.strip(".")
+                j=j.lower()
+                words_source[i]=j
+        if temp_skip == False and len(j) > 0: 
+            re_option = recognize(i, j)
+            if re_option == 0 :
+                j= roman2arabic(j)
+                nrl_result.append(num2words(j))
+            elif re_option == 2 :
+                nrl_result.append(read_number(j))
+            elif re_option == 4 :
+                nrl_result.append(read_time(j))
+            elif re_option == 5 :
+                nrl_result.append(read_date(j))
+            elif 6 <= re_option <= 8 :
+                nrl_result.append(read_ranges(i, re_option))
+            elif re_option == 9 :
+                nrl_result.extend(text_num_read(j))
+            elif j in shorts_dict :
+                nrl_result.append(shorts_dict[j])
+            elif j.lower() in shorts_dict :
+                nrl_result.append(shorts_dict[j.lower()])
+            else :
+                nrl_result.append(j.lower())
+
+    final_string = ""
+    for i in range(len(nrl_result)):
+            final_string += " " + nrl_result[i]
+
+    final_string = final_string.translate(str.maketrans('', '', string.punctuation))
+    final_string = final_string.strip()
+
+    # Tekst wynikowy
+    print(final_string)
+
 def recognize (index, word):
     if word.isalpha() == True:
         if word.isupper() == True and all(True if i in romannum_dict else False for i in word) == True:
@@ -203,73 +280,6 @@ def text_num_read(word):
     return split_text
     
 ###############################################
-# Wprowadzenie tekstu
-text_source = input("Wprowadź tekst: ")
-# split into words by white space
-words_source = text_source.split()
 
-words_source = [words_source[i].strip() for i in range(len(words_source))]
-words_source = [words_source[i].strip(",") for i in range(len(words_source))]
-
-# Dictionary
-mapping_dict = "dictionary.txt"
-mapping_lines = [l.strip() for l in open(mapping_dict, encoding='utf-8')] 
-# Digits Dictionary
-digits_dict = mapping_lines[:(mapping_lines.index("##$$**HOURS**$$##"))]
-# Hours Dictionary
-hours_dict = mapping_lines[(mapping_lines.index("##$$**HOURS**$$##")+1):(mapping_lines.index("##$$**DATES**$$##"))]
-# Dates Dictionary
-dates_dict = mapping_lines[(mapping_lines.index("##$$**DATES**$$##")+1):(mapping_lines.index("##$$**ROMANNUM**$$##"))]
-# Roman numbers Dictionary
-romannum_dict = {k: int(v) for k, v in (l.split() for l in mapping_lines[(mapping_lines.index("##$$**ROMANNUM**$$##")+1):(mapping_lines.index("##$$**SHORTSDOT**$$##"))])}
-# Dictionary shorts with dot
-shorts_dot_dict = {k: v.replace("_", " ") for k, v in (l.split() for l in mapping_lines[(mapping_lines.index("##$$**SHORTSDOT**$$##")+1):(mapping_lines.index("##$$**SHORTS**$$##"))])}
-# Dictionary shorts
-shorts_dict = {k: v.replace("_", " ") for k, v in (l.split() for l in mapping_lines[(mapping_lines.index("##$$**SHORTS**$$##")+1):(mapping_lines.index("##$$**END**$$##"))])}
-
-nrl_result = []
-
-# Przetwarzanie textu
-for i, j in enumerate(words_source):
-    temp_skip = False
-    if len(j) > 0 and j[-1]=="." :
-        if j.lower() in shorts_dot_dict:
-            nrl_result.append(shorts_dot_dict[j.lower()])
-            temp_skip = True
-        else:
-            j=j.strip(".")
-            j=j.lower()
-            words_source[i]=j
-    if temp_skip == False and len(j) > 0: 
-        re_option = recognize(i, j)
-        if re_option == 0 :
-            j= roman2arabic(j)
-            nrl_result.append(num2words(j))
-        elif re_option == 2 :
-            nrl_result.append(read_number(j))
-        elif re_option == 4 :
-            nrl_result.append(read_time(j))
-        elif re_option == 5 :
-            nrl_result.append(read_date(j))
-        elif 6 <= re_option <= 8 :
-            nrl_result.append(read_ranges(i, re_option))
-        elif re_option == 9 :
-            nrl_result.extend(text_num_read(j))
-        elif j in shorts_dict :
-            nrl_result.append(shorts_dict[j])
-        elif j.lower() in shorts_dict :
-            nrl_result.append(shorts_dict[j.lower()])
-        else :
-            nrl_result.append(j.lower())
-
-final_string = ""
-for i in range(len(nrl_result)):
-        final_string += " " + nrl_result[i]
-
-final_string = final_string.translate(str.maketrans('', '', string.punctuation))
-final_string = final_string.strip()
-
-# Tekst wynikowy
-print("FINISH")
-print(final_string)
-input()
+if __name__=="__main__":
+    main() 
