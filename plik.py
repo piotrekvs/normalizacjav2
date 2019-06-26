@@ -1,12 +1,12 @@
 import string
+import sys
 
 def main():
-    # Wprowadzenie tekstu
-    text_source = input("Wprowadź tekst: ")
-    # split into words by white space
     global words_source
-    words_source = text_source.split()
+    words_source = sys.argv[1:]
 
+    # split into words by white space
+    #words_source = text_source.split()
     words_source = [words_source[i].strip() for i in range(len(words_source))]
     words_source = [words_source[i].strip(",") for i in range(len(words_source))]
 
