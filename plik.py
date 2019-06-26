@@ -10,7 +10,7 @@ def main():
     words_source = [words_source[i].strip(",") for i in range(len(words_source))]
 
     # dict_new added
-    with open("dict_new.json") as f:
+    with open("dictionary_v2.json") as f:
         mapping_file_json = json.load(f)
 
     # Digits Dictionary
